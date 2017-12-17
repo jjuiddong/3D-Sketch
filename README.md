@@ -1,5 +1,6 @@
 # 3D-Sketch
-simple 3d sketch program using script 
+Simple 3d Sketch Program Using Script
+
 It was created for 3d program development and debugging.
 
 - Visual Studio Debug Watch Variable Copy and Paste to Script
