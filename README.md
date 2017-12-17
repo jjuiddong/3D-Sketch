@@ -6,6 +6,7 @@ It was created for 3d program development and debugging.
 - Visual Studio Debug Watch Variable Copy and Paste to Script
 - Display Box, Triangle, Direction
 - Collision Test, Triangle and Direction
+- C++, DX11, imgui
 
 
 ### Command Script Sample
