@@ -1,6 +1,8 @@
 
 #include "stdafx.h"
 #include "cmdview.h"
+#include "3dsketch.h"
+#include "3dview.h"
 
 
 using namespace graphic;
@@ -21,7 +23,7 @@ bool cCmdView::Init(graphic::cRenderer &renderer)
 }
 
 
-void cCmdView::OnRender(const float deltaSeconds) 
+void cCmdView::OnRender(const float deltaSeconds)
 {
 	ImGui::Text("Command");
 	
@@ -34,10 +36,13 @@ void cCmdView::OnRender(const float deltaSeconds)
 	ImGui::SameLine(0, 100);
 	if (ImGui::Button("?", ImVec2(50,0)))
 	{
+		cViewer *viewer = (cViewer*)g_application;
+		c3DView *p3dView = viewer->m_3dView;
+		p3dView->m_showHelp = !p3dView->m_showHelp;
 	}
 
 	const float w = m_rect.Width() - 50;
-	const float h = m_rect.Height() - 70;
+	const float h = m_rect.Height() - 90;
 	ImGui::InputTextMultiline(" ", m_text.m_str, sizeof(m_text.m_str)
 		, ImVec2(w, h));
 }

@@ -35,6 +35,7 @@ public:
 	graphic::cGridLine m_ground;
 	graphic::cRenderTarget m_renderTarget;
 	bool m_showGround;
+	bool m_showHelp;
 	graphic::cDbgLineList m_lineList;
 
 	// MouseMove Variable

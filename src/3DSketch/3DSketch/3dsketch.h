@@ -21,6 +21,6 @@ public:
 
 
 public:
-	c3DView *m_mapView;
+	c3DView *m_3dView;
 	cCmdView *m_cmdView;
 };

@@ -286,3 +286,5 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+src/3DSketch/3DSketch/errlog.txt
+src/3DSketch/3DSketch/log.txt

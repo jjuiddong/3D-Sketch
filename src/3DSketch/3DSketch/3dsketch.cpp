@@ -47,13 +47,13 @@ bool cViewer::OnInit()
 
 	m_gui.SetContext();
 
-	m_mapView = new c3DView("3D View");
-	m_mapView->Create(eDockState::DOCKWINDOW, eDockSlot::TAB, this, NULL);
-	bool result = m_mapView->Init(m_renderer);
+	m_3dView = new c3DView("3D View");
+	m_3dView->Create(eDockState::DOCKWINDOW, eDockSlot::TAB, this, NULL);
+	bool result = m_3dView->Init(m_renderer);
 	assert(result);
 
 	m_cmdView = new cCmdView("Command View");
-	m_cmdView->Create(eDockState::DOCKWINDOW, eDockSlot::BOTTOM, this, m_mapView, 0.25f);
+	m_cmdView->Create(eDockState::DOCKWINDOW, eDockSlot::BOTTOM, this, m_3dView, 0.25f);
 	result = m_cmdView->Init(m_renderer);
 	assert(result);
 

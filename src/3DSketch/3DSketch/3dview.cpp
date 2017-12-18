@@ -7,12 +7,32 @@
 using namespace graphic;
 using namespace framework;
 
+char *g_strHelp =
+"\n"
+"- Function Parameter\n"
+"Triangle <var name>, <pos1>, <pos2>, <pos3>\n"
+"Box <var name>, <pos>, <size>\n"
+"Direction <var name>, <origin pos>, <direction vector>\n"
+"\n"
+"- Example\n"
+"+curPos1{x=11.6843023 y=1.00000000 z=10.2523003 }common::Vector3\n"
+"+ curPos2{ x = 20.6843023 y = 1.00000000 z = 10.2523003 }common::Vector3\n"
+"+ curPos3{ x = 11.6843023 y = 10.00000000 z = 10.2523003 }common::Vector3\n"
+"+ dir{ x = 1 y = 0.00000000 z = 1 }common::Vector3\n"
+"x 0.16843023float\n"
+"Triangle tri1, curPos1, curPos2, curPos3\n"
+"Box box1, curPos1, 0.5\n"
+"Direction dir1, curPos1, dir\n"
+"\n"
+;
+
 
 c3DView::c3DView(const string &name)
 	: framework::cDockWindow(name)
 	, m_groundPlane1(Vector3(0, 1, 0), 0)
 	, m_groundPlane2(Vector3(0, -1, 0), 0)
 	, m_showGround(true)
+	, m_showHelp(false)
 	, m_incT(0)
 {
 }
@@ -157,7 +177,6 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			assert(0);
 			break;
 		}
-
 	}
 }
 
@@ -174,11 +193,16 @@ void c3DView::OnRender(const float deltaSeconds)
 	bool isOpen = true;
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 	ImGui::SetNextWindowPos(pos);
-	ImGui::SetNextWindowSize(ImVec2(min(m_viewRect.Width(), 500), 120));
-	if (ImGui::Begin("Information", &isOpen, ImVec2(500.f, 120.f), windowAlpha, flags))
+	ImGui::SetNextWindowSize(ImVec2(min(m_viewRect.Width(), 700), 500));
+	if (ImGui::Begin("Information", &isOpen, ImVec2(700.f, 500.f), windowAlpha, flags))
 	{
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Checkbox("Show Ground", &m_showGround);
+		ImGui::Checkbox("Show Help", &m_showHelp);
+
+		if (m_showHelp)
+			ImGui::Text(g_strHelp);
+
 		ImGui::End();
 	}
 
