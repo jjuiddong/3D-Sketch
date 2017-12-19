@@ -32,7 +32,9 @@ public:
 	struct sSymbol
 	{
 		StrId type;
-		Vector3 val;
+		Vector3 val1;
+		Vector3 val2;
+		Vector3 val3;
 	};
 
 

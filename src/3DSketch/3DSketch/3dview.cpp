@@ -114,9 +114,16 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it3)
 				break;
 
-			pos[0] = it1->second.val;
-			pos[1] = it2->second.val;
-			pos[2] = it3->second.val;
+			pos[0] = it1->second.val1;
+			pos[1] = it2->second.val1;
+			pos[2] = it3->second.val1;
+
+			cCmdView::sSymbol symbol;
+			symbol.type = cmd.id;
+			symbol.val1 = pos[0];
+			symbol.val2 = pos[1];
+			symbol.val3 = pos[2];
+			cmdView->m_vars[cmd.id] = symbol;
 
 			m_lineList.ClearLines();
 			m_lineList.AddLine(renderer, pos[0], pos[1], false);
@@ -124,6 +131,11 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			m_lineList.AddLine(renderer, pos[2], pos[0], false);
 			m_lineList.UpdateBuffer(renderer);
 			m_lineList.Render(renderer);
+
+			Triangle tri(pos[0], pos[1], pos[2]);
+			const Vector3 center = (pos[0] + pos[1] + pos[2]) / 3.f;
+			renderer.m_dbgArrow.SetDirection(center, center + tri.Normal()*0.5f, 0.1f);
+			renderer.m_dbgArrow.Render(renderer);
 		}
 		break;
 
@@ -142,11 +154,11 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			}
 			else
 			{
-				size = it2->second.val;
+				size = it2->second.val1;
 			}
 
 			cBoundingBox bbox;
-			bbox.SetBoundingBox(it1->second.val, size, Quaternion());
+			bbox.SetBoundingBox(it1->second.val1, size, Quaternion());
 			renderer.m_dbgBox.SetBox(bbox);
 			renderer.m_dbgBox.m_color = cColor::WHITE;
 			renderer.m_dbgBox.Render(renderer);
@@ -163,15 +175,55 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it2)
 				break;
 
-			const Vector3 orig = it1->second.val;
-			const Vector3 dir = it2->second.val;
+			const Vector3 orig = it1->second.val1;
+			const Vector3 dir = it2->second.val1;
 			renderer.m_dbgLine.SetLine(orig, orig + dir*10.f, 0.05f);
 			renderer.m_dbgLine.Render(renderer);
+
+			cCmdView::sSymbol symbol;
+			symbol.type = cmd.id;
+			symbol.val1 = orig;
+			symbol.val2 = dir;
+			cmdView->m_vars[cmd.id] = symbol;
 		}
 		break;
 
 		case cCmdView::sCmd::COLLISION:
-			break;
+		{
+			Vector3 pos[3];
+			{
+				auto it1 = cmdView->m_vars.find(cmd.arg1); // Triangle
+				if (cmdView->m_vars.end() == it1)
+					break;
+				pos[0] = it1->second.val1;
+				pos[1] = it1->second.val2;
+				pos[2] = it1->second.val3;
+			}
+
+			Vector3 orig, dir;
+			{
+				auto it1 = cmdView->m_vars.find(cmd.arg2); // Direction
+				if (cmdView->m_vars.end() == it1)
+					break;
+
+				orig = it1->second.val1;
+				dir = it1->second.val2;
+			}
+
+			Triangle tri(pos[0], pos[1], pos[2]);
+			float t, u, v;
+			if (tri.Intersect(orig, dir, &t, &u, &v))
+			{
+				const Vector3 collisionPos = tri.a.Interpolate(tri.b, u) + tri.a.Interpolate(tri.c, v) - tri.a;
+
+				cBoundingBox bbox;
+				bbox.SetBoundingBox(collisionPos, Vector3(1,1,1)*0.1f, Quaternion());
+				renderer.m_dbgBox.SetBox(bbox);
+				renderer.m_dbgBox.m_color = cColor::RED;
+				renderer.m_dbgBox.Render(renderer);
+			}
+		}
+		break;
 
 		default:
 			assert(0);

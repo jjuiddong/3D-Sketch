@@ -18,6 +18,7 @@ cViewer::cViewer()
 	//const RECT r = { 0, 0, 1024, 768 };
 	const RECT r = { 0, 0, 1280, 1024 };
 	m_windowRect = r;
+	m_isLazyMode = true;
 }
 
 cViewer::~cViewer()

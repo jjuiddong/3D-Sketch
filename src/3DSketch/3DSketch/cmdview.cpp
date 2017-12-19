@@ -147,7 +147,7 @@ bool cCmdView::ParseLine(const char *str)
 
 		sSymbol symbol;
 		symbol.type = type;
-		symbol.val = Vector3((float)atof(num1.m_str), (float)atof(num2.m_str), (float)atof(num3.m_str));
+		symbol.val1 = Vector3((float)atof(num1.m_str), (float)atof(num2.m_str), (float)atof(num3.m_str));
 		m_vars[id] = symbol;
 	}
 	else
@@ -160,7 +160,7 @@ bool cCmdView::ParseLine(const char *str)
 
 		sSymbol symbol;
 		symbol.type = type;
-		symbol.val = Vector3(1,1,1) * (float)atof(num.m_str);
+		symbol.val1 = Vector3(1,1,1) * (float)atof(num.m_str);
 		m_vars[id] = symbol;
 	}
 
@@ -221,7 +221,15 @@ bool cCmdView::ParseFunction(const sCmd::Enum func, const char *str)
 	break;
 
 	case sCmd::COLLISION:
-		break;
+	{
+		sCmd cmd;
+		cmd.cmd = func;
+		str = Str(str, cmd.arg1); // Triangle
+		str = Match(str, ',');
+		str = Str(str, cmd.arg2); // Direction
+		m_cmds.push_back(cmd);
+	}
+	break;
 
 	default:
 		assert(0);
@@ -254,7 +262,7 @@ const char* cCmdView::Str(const char *str, OUT StrId &out)
 // return number, float, int
 const char* cCmdView::Number(const char *str, OUT StrId &out)
 {
-	const char *digitOp = ".+-";
+	const char *digitOp = ".+-e";
 	const int maxSize = sizeof(out.m_str) - 1;
 	int i = 0;
 	while (*str && (i < maxSize) 
