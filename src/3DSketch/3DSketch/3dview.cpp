@@ -246,6 +246,7 @@ void c3DView::OnRender(const float deltaSeconds)
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 	ImGui::SetNextWindowPos(pos);
 	ImGui::SetNextWindowSize(ImVec2(min(m_viewRect.Width(), 700), 500));
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
 	if (ImGui::Begin("Information", &isOpen, ImVec2(700.f, 500.f), windowAlpha, flags))
 	{
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -257,6 +258,7 @@ void c3DView::OnRender(const float deltaSeconds)
 
 		ImGui::End();
 	}
+	ImGui::PopStyleColor();
 
 	{
 		ImGui::BeginTooltip();
