@@ -40,7 +40,7 @@ public:
 
 protected:
 	bool Parse();
-	bool ParseLine(const char *str);
+	int ParseLine(const char *str, const int prevLineType, OUT string &outVarName);
 	bool ParseFunction(const sCmd::Enum func, const char *str);
 	const char* GetLine(const char *str, OUT Str256 &out);
 	const char* Str(const char *str, OUT StrId &out);

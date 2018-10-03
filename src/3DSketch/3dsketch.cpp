@@ -15,7 +15,8 @@ cViewer::cViewer()
 {
 	m_windowName = L"3D Sketch";
 	//m_isLazyMode = true;
-	const RECT r = { 0, 0, 1024, 768 };
+	//const RECT r = { 0, 0, 1024, 768 };
+	const RECT r = { 0, 0, 800, 800 };
 	//const RECT r = { 0, 0, 1280, 1024 };
 	m_windowRect = r;
 	m_isLazyMode = true;
@@ -54,7 +55,7 @@ bool cViewer::OnInit()
 	assert(result);
 
 	m_cmdView = new cCmdView("Command View");
-	m_cmdView->Create(eDockState::DOCKWINDOW, eDockSlot::BOTTOM, this, m_3dView, 0.25f);
+	m_cmdView->Create(eDockState::DOCKWINDOW, eDockSlot::BOTTOM, this, m_3dView, 0.4f);
 	result = m_cmdView->Init(m_renderer);
 	assert(result);
 

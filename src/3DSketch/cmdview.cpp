@@ -44,7 +44,7 @@ void cCmdView::OnRender(const float deltaSeconds)
 	const float w = m_rect.Width() - 20;
 	const float h = m_rect.Height() - 70;
 	ImGui::InputTextMultiline(" ", m_text.m_str, sizeof(m_text.m_str)
-		, ImVec2(w, h));
+		, ImVec2(w, h), ImGuiInputTextFlags_AllowTabInput);
 }
 
 
@@ -54,12 +54,14 @@ bool cCmdView::Parse()
 	m_cmds.clear();
 	m_vars.clear();
 
+	int prevLineType = 0;
+	string varName;	
 	const char *str = m_text.m_str;
 	while (1)
 	{
 		Str256 line;
 		str = GetLine(str, line);
-		ParseLine(line.m_str);
+		prevLineType = ParseLine(line.m_str, prevLineType, varName);
 
 		if (*str == NULL)
 			break; // Line End
@@ -96,23 +98,36 @@ const char* cCmdView::GetLine(const char *str, OUT Str256 &out)
 //
 // Vector Type
 //		[+/-] string [{] x '=' number y '=' number z '=' number [}] string
+// Vector Array Type (Expand Tree) 
+//		[-] string ignore string
+//		+ [index] [{] x '=' number y '=' number z '=' number [}] string
 // float Type
 //		string number string
 // Triangle tri1, curPos, curPos, curPos
 // Direction dir1, curPos, dir
 // Collision tri1, dir1
 // Box box1, curPos, 0.1
-bool cCmdView::ParseLine(const char *str)
+//
+// return value 0: error
+//				1: success
+//				2: array expand
+int cCmdView::ParseLine(const char *str, const int prevLineType, OUT string &outVarName)
 {
-	if ((*str == '+') || (*str == '-'))
+	const bool collapse = (*str == '+');
+	const bool expand = (*str == '-');
+	if (collapse || expand)
 		++str;
 
 	StrId id;
 	str = Str(str, id);
 	if (id.empty())
-		return false; // error
+		return 0; // error
 
 	const sCmd::Enum funcType = GetFunctionType(id);
+
+	// ingore space
+	while ((*str != NULL) && ((*str == ' ') || (*str == '\t')))
+		++str;
 
 	if (sCmd::NONE != funcType)
 	{ 
@@ -148,7 +163,22 @@ bool cCmdView::ParseLine(const char *str)
 		sSymbol symbol;
 		symbol.type = type;
 		symbol.val1 = Vector3((float)atof(num1.m_str), (float)atof(num2.m_str), (float)atof(num3.m_str));
-		m_vars[id] = symbol;
+		
+		if ((prevLineType == 2) && collapse)
+		{
+			StrId arId = outVarName.c_str();
+			arId += id;
+			m_vars[arId] = symbol;
+		}
+		else
+		{
+			m_vars[id] = symbol;
+		}
+	}
+	else if (expand)
+	{
+		// array type, update variable name
+		outVarName = id.c_str();
 	}
 	else
 	{
@@ -164,7 +194,16 @@ bool cCmdView::ParseLine(const char *str)
 		m_vars[id] = symbol;
 	}
 
-	return true;
+	if ((prevLineType == 2) && collapse)
+	{
+		if ('[' == id.m_str[0])
+		{
+			// array expand parsing, parse next line with array expand type
+			return 2;
+		}
+	}
+
+	return expand? 2 : 1;
 }
 
 
@@ -246,11 +285,11 @@ const char* cCmdView::Str(const char *str, OUT StrId &out)
 	const int maxSize = sizeof(out.m_str) - 1;
 	int i = 0;
 	while (*str && (i < maxSize) 
-		&& (is_alpha(*str) || isdigit(*str) 
-			|| ((i == 0) && (*str == ' ')))) // alphabet
+		&& (is_alpha(*str) || isdigit(*str) || (*str == '[') || (*str == ']')
+			|| ((i == 0) && ((*str == ' ') || (*str == '\t'))))) // alphabet
 	{
 		char c = *str++;
-		if (c != ' ') // ignore space character
+		if ((c != ' ') && (c != '\t')) // ignore space character
 			out.m_str[i++] = c;
 	}
 	out.m_str[i] = NULL;
