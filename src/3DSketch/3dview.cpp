@@ -33,6 +33,7 @@ c3DView::c3DView(const string &name)
 	, m_groundPlane2(Vector3(0, -1, 0), 0)
 	, m_showGround(true)
 	, m_showHelp(false)
+	, m_showAxis(true)
 	, m_incT(0)
 {
 }
@@ -84,6 +85,9 @@ void c3DView::OnPreRender(const float deltaSeconds)
 
 		if (m_showGround)
 			m_ground.Render(renderer);
+
+		if (m_showAxis)
+			renderer.RenderAxis();
 
 		RenderCmd(renderer);
 	}
@@ -245,13 +249,15 @@ void c3DView::OnRender(const float deltaSeconds)
 	bool isOpen = true;
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 	ImGui::SetNextWindowPos(pos);
-	ImGui::SetNextWindowSize(ImVec2(min(m_viewRect.Width(), 700), 500));
+	ImGui::SetNextWindowBgAlpha(windowAlpha);
+	ImGui::SetNextWindowSize(ImVec2(min(m_viewRect.Width(), 700), min(m_viewRect.Height(), 500)));
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
-	if (ImGui::Begin("Information", &isOpen, ImVec2(700.f, 500.f), windowAlpha, flags))
+	if (ImGui::Begin("Information", &isOpen, flags))
 	{
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Checkbox("Show Ground", &m_showGround);
-		ImGui::Checkbox("Show Help", &m_showHelp);
+		ImGui::SameLine(); ImGui::Checkbox("Show Axis", &m_showAxis);
+		ImGui::SameLine(); ImGui::Checkbox("Show Help", &m_showHelp);
 
 		if (m_showHelp)
 			ImGui::Text(g_strHelp);

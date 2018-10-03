@@ -41,8 +41,8 @@ void cCmdView::OnRender(const float deltaSeconds)
 		p3dView->m_showHelp = !p3dView->m_showHelp;
 	}
 
-	const float w = m_rect.Width() - 50;
-	const float h = m_rect.Height() - 90;
+	const float w = m_rect.Width() - 20;
+	const float h = m_rect.Height() - 70;
 	ImGui::InputTextMultiline(" ", m_text.m_str, sizeof(m_text.m_str)
 		, ImVec2(w, h));
 }
