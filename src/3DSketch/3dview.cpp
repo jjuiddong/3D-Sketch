@@ -34,6 +34,7 @@ c3DView::c3DView(const string &name)
 	, m_showGround(true)
 	, m_showHelp(false)
 	, m_showAxis(true)
+	, m_showId(true)
 	, m_incT(0)
 {
 }
@@ -140,6 +141,8 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			const Vector3 center = (pos[0] + pos[1] + pos[2]) / 3.f;
 			renderer.m_dbgArrow.SetDirection(center, center + tri.Normal()*0.5f, 0.1f);
 			renderer.m_dbgArrow.Render(renderer);
+
+			RenderId(renderer, (pos[0] + pos[1] + pos[2]) / 3.f, cmd.id);
 		}
 		break;
 
@@ -166,6 +169,8 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			renderer.m_dbgBox.SetBox(bbox);
 			renderer.m_dbgBox.m_color = cColor::WHITE;
 			renderer.m_dbgBox.Render(renderer);
+
+			RenderId(renderer, it1->second.val1, cmd.id);
 		}
 		break;
 
@@ -189,6 +194,8 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			symbol.val1 = orig;
 			symbol.val2 = dir;
 			cmdView->m_vars[cmd.id] = symbol;
+
+			RenderId(renderer, orig + dir * 5.f, cmd.id);
 		}
 		break;
 
@@ -237,6 +244,23 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 }
 
 
+// Name 출력 (3D 객체와 겹치지 않게 좌표를 계산한다.)
+void c3DView::RenderId(graphic::cRenderer &renderer, const Vector3 &pos, const StrId &id)
+{
+	RET(!m_showId);
+
+	const Vector2 spos = GetMainCamera().GetScreenPos(pos) + Vector2(0, -20);
+	const Ray ray = GetMainCamera().GetRay((int)spos.x, (int)spos.y);
+
+	Transform tm;
+	tm.pos = ray.orig + ray.dir * (ray.orig.Distance(pos));
+	tm.scale = Vector3(1, 1, 1) * 0.4f;
+	renderer.m_textMgr.AddTextRender(renderer, id.GetHashCode()
+		, id.wstr().c_str(), cColor::WHITE, cColor::BLACK
+		, BILLBOARD_TYPE::ALL_AXIS, tm, true);
+}
+
+
 void c3DView::OnRender(const float deltaSeconds)
 {
 	ImVec2 pos = ImGui::GetCursorScreenPos();
@@ -257,6 +281,7 @@ void c3DView::OnRender(const float deltaSeconds)
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Checkbox("Show Ground", &m_showGround);
 		ImGui::SameLine(); ImGui::Checkbox("Show Axis", &m_showAxis);
+		ImGui::SameLine(); ImGui::Checkbox("Show Id", &m_showId);
 		ImGui::SameLine(); ImGui::Checkbox("Show Help", &m_showHelp);
 
 		if (m_showHelp)

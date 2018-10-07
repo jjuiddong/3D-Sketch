@@ -22,6 +22,7 @@ public:
 
 protected:
 	void RenderCmd(graphic::cRenderer &renderer);
+	void RenderId(graphic::cRenderer &renderer, const Vector3 &pos, const StrId &id);
 	void UpdateLookAt();
 	void OnWheelMove(const float delta, const POINT mousePt);
 	void OnMouseMove(const POINT mousePt);
@@ -37,6 +38,7 @@ public:
 	bool m_showGround;
 	bool m_showHelp;
 	bool m_showAxis;
+	bool m_showId;
 	graphic::cDbgLineList m_lineList;
 
 	// MouseMove Variable
