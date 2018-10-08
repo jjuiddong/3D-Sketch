@@ -291,6 +291,11 @@ void c3DView::OnRender(const float deltaSeconds)
 	}
 	ImGui::PopStyleColor();
 
+	// 마우스가 3D화면에 있을 때만 툴팁을 출력한다.
+	POINT cursorPos;
+	GetCursorPos(&cursorPos);
+	ScreenToClient(m_owner->getSystemHandle(), &cursorPos);
+	if (m_rect.IsIn(cursorPos.x, cursorPos.y))
 	{
 		ImGui::BeginTooltip();
 		const Ray ray = m_camera.GetRay(m_mousePos.x, m_mousePos.y);
