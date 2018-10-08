@@ -23,5 +23,6 @@ Box box1, curPos1, 0.5
 Direction dir1, curPos1, dir
 ~~~~
 
+![](https://github.com/jjuiddong/3D-Sketch/blob/master/doc/3dscatch.png?raw=true)
 ![](https://github.com/jjuiddong/3D-Sketch/blob/master/doc/3dsketch1.png?raw=true)
 ![](https://github.com/jjuiddong/3D-Sketch/blob/master/doc/3dsketch2.png?raw=true)
