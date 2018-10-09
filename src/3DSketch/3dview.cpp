@@ -286,9 +286,8 @@ void c3DView::OnRender(const float deltaSeconds)
 
 		if (m_showHelp)
 			ImGui::Text(g_strHelp);
-
-		ImGui::End();
 	}
+	ImGui::End();
 	ImGui::PopStyleColor();
 
 	// 마우스가 3D화면에 있을 때만 툴팁을 출력한다.
