@@ -13,16 +13,21 @@ char *g_strHelp =
 "Triangle <var name>, <pos1>, <pos2>, <pos3>\n"
 "Box <var name>, <pos>, <size>\n"
 "Direction <var name>, <origin pos>, <direction vector>\n"
+"Camera <eyepos>, <lookat>\n"
+"Ground <row cellcount>, <col cellcount>, <cell width>, <col height>\n"
 "\n"
 "- Example\n"
 "+curPos1{x=11.6843023 y=1.00000000 z=10.2523003 }common::Vector3\n"
 "+ curPos2{ x = 20.6843023 y = 1.00000000 z = 10.2523003 }common::Vector3\n"
 "+ curPos3{ x = 11.6843023 y = 10.00000000 z = 10.2523003 }common::Vector3\n"
 "+ dir{ x = 1 y = 0.00000000 z = 1 }common::Vector3\n"
+"+ eyePos{x=1387.48193 y=16.7042408 z=5924.47266 }	common::Vector3\n"
+"+ lookAt{x=1354.61731 y=-1.80036104 z=5932.97900 }	common::Vector3\n"
 "x 0.16843023float\n"
 "Triangle tri1, curPos1, curPos2, curPos3\n"
 "Box box1, curPos1, 0.5\n"
 "Direction dir1, curPos1, dir\n"
+"Camera eyePos, lookAt \n"
 "\n"
 ;
 
@@ -47,7 +52,7 @@ c3DView::~c3DView()
 bool c3DView::Init(cRenderer &renderer)
 {
 	m_camera.SetCamera(Vector3(-100, 60, -100), Vector3(0, 0, 0), Vector3(0, 1, 0));
-	m_camera.SetProjection(MATH_PI / 4.f, m_rect.Width() / m_rect.Height(), 1, 10000.f);
+	m_camera.SetProjection(MATH_PI / 4.f, m_rect.Width() / m_rect.Height(), 0.1f, 10000.f);
 	m_camera.SetViewPort(m_rect.Width(), m_rect.Height());
 
 	sf::Vector2u size((u_int)m_rect.Width() - 15, (u_int)m_rect.Height() - 50);
@@ -186,7 +191,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 
 			const Vector3 orig = it1->second.val1;
 			const Vector3 dir = it2->second.val1;
-			renderer.m_dbgLine.SetLine(orig, orig + dir*10.f, 0.05f);
+			renderer.m_dbgLine.SetLine(orig, orig + dir * 10.f, 0.05f);
 			renderer.m_dbgLine.Render(renderer);
 
 			cCmdView::sSymbol symbol;
@@ -228,10 +233,97 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 				const Vector3 collisionPos = tri.a.Interpolate(tri.b, u) + tri.a.Interpolate(tri.c, v) - tri.a;
 
 				cBoundingBox bbox;
-				bbox.SetBoundingBox(collisionPos, Vector3(1,1,1)*0.1f, Quaternion());
+				bbox.SetBoundingBox(collisionPos, Vector3(1, 1, 1)*0.1f, Quaternion());
 				renderer.m_dbgBox.SetBox(bbox);
 				renderer.m_dbgBox.m_color = cColor::RED;
 				renderer.m_dbgBox.Render(renderer);
+			}
+		}
+		break;
+
+		case cCmdView::sCmd::CAMERA:
+		{
+			if (!cmdView->m_isUpdateCamera)
+				break;
+
+			auto it1 = cmdView->m_vars.find(cmd.arg1); // eyepos
+			if (cmdView->m_vars.end() == it1)
+				break;
+
+			auto it2 = cmdView->m_vars.find(cmd.arg2); // lookat
+			if (cmdView->m_vars.end() == it2)
+				break;
+
+			const Vector3 eyePos = it1->second.val1;
+			const Vector3 lookAt = it2->second.val1;
+			m_camera.SetEyePos(eyePos);
+			m_camera.SetLookAt(lookAt);
+
+			// move ground gridline
+			m_ground.m_transform.pos = lookAt;
+			m_ground.m_transform.pos.y = 0.f;
+		}
+		break;
+
+		case cCmdView::sCmd::GROUND:
+		{
+			int rowCellCount = 1;
+			int colCellCount = 1;
+			float cellWidth = 1.0f;
+			float cellHeight = 1.0f;
+
+			auto it1 = cmdView->m_vars.find(cmd.arg1); // row cell count
+			if (cmdView->m_vars.end() == it1)
+			{
+				if (!cmd.arg1.empty())
+					rowCellCount = atoi(cmd.arg1.m_str);
+			}
+			else
+			{
+				rowCellCount = (int)it1->second.val1.x;
+			}
+
+			auto it2 = cmdView->m_vars.find(cmd.arg2); // col cell count
+			if (cmdView->m_vars.end() == it2)
+			{
+				if (!cmd.arg2.empty())
+					colCellCount = atoi(cmd.arg2.m_str);
+			}
+			else
+			{
+				colCellCount = (int)it2->second.val1.x;
+			}
+
+			auto it3 = cmdView->m_vars.find(cmd.arg3); // cell width
+			if (cmdView->m_vars.end() == it3)
+			{
+				if (!cmd.arg3.empty())
+					cellWidth = (float)atof(cmd.arg3.m_str);
+			}
+			else
+			{
+				cellWidth = it3->second.val1.x;
+			}
+
+			auto it4 = cmdView->m_vars.find(cmd.arg4); // cell height
+			if (cmdView->m_vars.end() == it4)
+			{
+				if (!cmd.arg4.empty())
+					cellHeight = (float)atof(cmd.arg4.m_str);
+			}
+			else
+			{
+				cellHeight = it4->second.val1.x;
+			}
+
+			if ((m_ground.m_rowCellCount != rowCellCount)
+				|| (m_ground.m_colCellCount != colCellCount)
+				|| (m_ground.m_cellSizeW != cellWidth)
+				|| (m_ground.m_cellSizeH != cellHeight))
+			{
+				m_ground.Clear();
+				m_ground.Create(renderer, rowCellCount, colCellCount
+					, cellWidth, cellHeight);
 			}
 		}
 		break;
@@ -274,7 +366,7 @@ void c3DView::OnRender(const float deltaSeconds)
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 	ImGui::SetNextWindowPos(pos);
 	ImGui::SetNextWindowBgAlpha(windowAlpha);
-	ImGui::SetNextWindowSize(ImVec2(min(m_viewRect.Width(), 700), min(m_viewRect.Height(), 500)));
+	ImGui::SetNextWindowSize(ImVec2(min(m_viewRect.Width(), 700.f), min(m_viewRect.Height(), 500.f)));
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
 	if (ImGui::Begin("Information", &isOpen, flags))
 	{
@@ -294,7 +386,7 @@ void c3DView::OnRender(const float deltaSeconds)
 	POINT cursorPos;
 	GetCursorPos(&cursorPos);
 	ScreenToClient(m_owner->getSystemHandle(), &cursorPos);
-	if (m_rect.IsIn(cursorPos.x, cursorPos.y))
+	if (m_rect.IsIn((float)cursorPos.x, (float)cursorPos.y))
 	{
 		ImGui::BeginTooltip();
 		const Ray ray = m_camera.GetRay(m_mousePos.x, m_mousePos.y);

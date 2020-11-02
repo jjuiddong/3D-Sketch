@@ -19,7 +19,7 @@ public:
 	struct sCmd
 	{
 		enum Enum {
-			NONE, TRIANGLE, BOX, DIRECTION, COLLISION,
+			NONE, TRIANGLE, BOX, DIRECTION, COLLISION, CAMERA, GROUND
 		};
 
 		Enum cmd;
@@ -27,6 +27,7 @@ public:
 		StrId arg1;
 		StrId arg2;
 		StrId arg3;
+		StrId arg4;
 	};
 
 	struct sSymbol
@@ -53,6 +54,7 @@ protected:
 
 
 public:
+	bool m_isUpdateCamera;
 	String<char, 2048> m_text;
 	vector<sCmd> m_cmds;
 	map<StrId, sSymbol> m_vars;

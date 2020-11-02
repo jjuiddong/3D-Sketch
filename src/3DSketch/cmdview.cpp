@@ -7,7 +7,9 @@
 
 using namespace graphic;
 
-cCmdView::cCmdView(const string &name) : framework::cDockWindow(name) 
+cCmdView::cCmdView(const string &name) 
+	: framework::cDockWindow(name) 
+	, m_isUpdateCamera(false)
 {
 }
 
@@ -33,7 +35,10 @@ void cCmdView::OnRender(const float deltaSeconds)
 		Parse();
 	}
 
-	ImGui::SameLine(0, 100);
+	ImGui::SameLine(0, 50);
+	ImGui::Checkbox("Camera", &m_isUpdateCamera);
+
+	ImGui::SameLine(0, 50);
 	if (ImGui::Button("?", ImVec2(50,0)))
 	{
 		cViewer *viewer = (cViewer*)g_application;
@@ -107,6 +112,7 @@ const char* cCmdView::GetLine(const char *str, OUT Str256 &out)
 // Direction dir1, curPos, dir
 // Collision tri1, dir1
 // Box box1, curPos, 0.1
+// Camera eyePos, lookAt
 //
 // return value 0: error
 //				1: success
@@ -270,6 +276,32 @@ bool cCmdView::ParseFunction(const sCmd::Enum func, const char *str)
 	}
 	break;
 
+	case sCmd::CAMERA:
+	{
+		sCmd cmd;
+		cmd.cmd = func;
+		str = Str(str, cmd.arg1); // Camera EyePos
+		str = Match(str, ',');
+		str = Str(str, cmd.arg2); // Camera LookAt
+		m_cmds.push_back(cmd);
+	}
+	break;
+
+	case sCmd::GROUND:
+	{
+		sCmd cmd;
+		cmd.cmd = func;
+		str = Number(str, cmd.arg1); // row cell count
+		str = Match(str, ',');
+		str = Number(str, cmd.arg2); // col cell count
+		str = Match(str, ',');
+		str = Number(str, cmd.arg3); // cell width
+		str = Match(str, ',');
+		str = Number(str, cmd.arg4); // cell height
+		m_cmds.push_back(cmd);
+	}
+	break;
+
 	default:
 		assert(0);
 		break;
@@ -365,6 +397,14 @@ cCmdView::sCmd::Enum cCmdView::GetFunctionType(const StrId &str)
 	else if (str == "Collision")
 	{
 		return sCmd::COLLISION;
+	}
+	else if (str == "Camera")
+	{
+		return sCmd::CAMERA;
+	}
+	else if (str == "Ground")
+	{
+		return sCmd::GROUND;
 	}
 
 	return sCmd::NONE;

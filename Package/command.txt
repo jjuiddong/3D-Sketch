@@ -1,0 +1,18 @@
++		p0	{x=1364.43750 y=0.249333680 z=5932.00000 }	common::Vector3
++		p1	{x=1364.06250 y=0.249948353 z=5932.07813 }	common::Vector3
++		vp0	{x=1365.12500 y=0.250004232 z=5931.79688 }	common::Vector3
++		vp1	{x=1364.75000 y=0.250004232 z=5931.89063 }	common::Vector3
+
++		eyePos	{x=1387.48193 y=16.7042408 z=5924.47266 }	common::Vector3
++		lookAt	{x=1354.61731 y=-1.80036104 z=5932.97900 }	common::Vector3
+
+Box box1, p0 0.01
+Box box2,  p1, 0.01
+Box box3, vp0 0.01
+Box box4,  vp1, 0.01
+//Box box5, vp2 0.01
+//Box box6,  vp3, 0.01
+
+Camera eyePos, lookAt
+Ground 300, 300, 0.1, 0.1
+
