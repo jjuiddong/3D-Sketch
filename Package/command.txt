@@ -6,13 +6,18 @@
 +		eyePos	{x=1387.48193 y=16.7042408 z=5924.47266 }	common::Vector3
 +		lookAt	{x=1354.61731 y=-1.80036104 z=5932.97900 }	common::Vector3
 
-Box box1, p0 0.01
-Box box2,  p1, 0.01
-Box box3, vp0 0.01
-Box box4,  vp1, 0.01
++		Center	{x=7.00000000 y=3.55271368e-15 z=3.75000000 }	DirectX::XMFLOAT3
++		Extents	{x=1.55000007 y=0.100000001 z=1.30000007 }	DirectX::XMFLOAT3
++		Orientation	{x=-0.00000000 y=0.007106829 z=0.00000000 w=1.0 }	DirectX::XMFLOAT4
+
+
+Box2 box, Center, Extents, Orientation
+//Box box2,  p1, 0.01
+//Box box3, vp0 0.01
+//Box box4,  vp1, 0.01
 //Box box5, vp2 0.01
 //Box box6,  vp3, 0.01
 
-Camera eyePos, lookAt
-Ground 300, 300, 0.1, 0.1
+//Camera eyePos, lookAt
+//Ground 300, 300, 0.1, 0.1
 

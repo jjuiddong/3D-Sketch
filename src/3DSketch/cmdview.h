@@ -19,7 +19,7 @@ public:
 	struct sCmd
 	{
 		enum Enum {
-			NONE, TRIANGLE, BOX, DIRECTION, COLLISION, CAMERA, GROUND
+			NONE, TRIANGLE, BOX, BOX2, DIRECTION, COLLISION, CAMERA, GROUND
 		};
 
 		Enum cmd;
@@ -36,6 +36,7 @@ public:
 		Vector3 val1;
 		Vector3 val2;
 		Vector3 val3;
+		Vector4 val4;
 	};
 
 

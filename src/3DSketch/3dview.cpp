@@ -12,6 +12,7 @@ char *g_strHelp =
 "- Function Parameter\n"
 "Triangle <var name>, <pos1>, <pos2>, <pos3>\n"
 "Box <var name>, <pos>, <size>\n"
+"Box2 <var name>, <pos>, <scale>, <rot>\n"
 "Direction <var name>, <origin pos>, <direction vector>\n"
 "Camera <eyepos>, <lookat>\n"
 "Ground <row cellcount>, <col cellcount>, <cell width>, <col height>\n"
@@ -23,6 +24,7 @@ char *g_strHelp =
 "+ dir{ x = 1 y = 0.00000000 z = 1 }common::Vector3\n"
 "+ eyePos{x=1387.48193 y=16.7042408 z=5924.47266 }	common::Vector3\n"
 "+ lookAt{x=1354.61731 y=-1.80036104 z=5932.97900 }	common::Vector3\n"
+"+ Orientation{x=-0.00000000 y=0.707106829 z=0.00000000 w=0.707 } common::Quaternion\n"
 "x 0.16843023float\n"
 "Triangle tri1, curPos1, curPos2, curPos3\n"
 "Box box1, curPos1, 0.5\n"
@@ -55,7 +57,7 @@ bool c3DView::Init(cRenderer &renderer)
 	m_camera.SetProjection(MATH_PI / 4.f, m_rect.Width() / m_rect.Height(), 0.1f, 10000.f);
 	m_camera.SetViewPort(m_rect.Width(), m_rect.Height());
 
-	sf::Vector2u size((u_int)m_rect.Width() - 15, (u_int)m_rect.Height() - 50);
+	sf::Vector2u size((uint)m_rect.Width() - 15, (uint)m_rect.Height() - 50);
 	cViewport vp = renderer.m_viewPort;
 	vp.m_vp.Width = (float)size.x;
 	vp.m_vp.Height = (float)size.y;
@@ -171,6 +173,42 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 
 			cBoundingBox bbox;
 			bbox.SetBoundingBox(it1->second.val1, size, Quaternion());
+			renderer.m_dbgBox.SetBox(bbox);
+			renderer.m_dbgBox.m_color = cColor::WHITE;
+			renderer.m_dbgBox.Render(renderer);
+
+			RenderId(renderer, it1->second.val1, cmd.id);
+		}
+		break;
+
+		case cCmdView::sCmd::BOX2:
+		{
+			auto it1 = cmdView->m_vars.find(cmd.arg1); // box position
+			if (cmdView->m_vars.end() == it1)
+				break;
+
+			Vector3 size(1, 1, 1);
+			auto it2 = cmdView->m_vars.find(cmd.arg2); // box scale
+			if (cmdView->m_vars.end() == it2)
+			{
+				if (!cmd.arg2.empty())
+					size = Vector3(1, 1, 1)*(float)atof(cmd.arg2.m_str);
+			}
+			else
+			{
+				size = it2->second.val1;
+			}
+
+			Quaternion q;
+			auto it3 = cmdView->m_vars.find(cmd.arg3); // box orientation
+			if (cmdView->m_vars.end() != it3)
+			{
+				const Vector4 &v = it3->second.val4;
+				q = Quaternion(v.x, v.y, v.z, v.w);
+			}
+
+			cBoundingBox bbox;
+			bbox.SetBoundingBox(it1->second.val1, size, q);
 			renderer.m_dbgBox.SetBox(bbox);
 			renderer.m_dbgBox.m_color = cColor::WHITE;
 			renderer.m_dbgBox.Render(renderer);

@@ -161,14 +161,29 @@ int cCmdView::ParseLine(const char *str, const int prevLineType, OUT string &out
 		StrId num3;
 		str = Number(str, num3);
 
+		StrId var4;
+		str = Str(str, var4);
+		StrId num4;
+		if (var4 == "w")
+		{
+			str = Match(str, '=');
+			str = Number(str, num4);
+		}
+			
+		str = Match(str, '}');
+
 		StrId type;
 		str = Str(str, type);
 
-		str = Match(str, '}');
-
 		sSymbol symbol;
 		symbol.type = type;
-		symbol.val1 = Vector3((float)atof(num1.m_str), (float)atof(num2.m_str), (float)atof(num3.m_str));
+		
+		if (num4.empty())
+			symbol.val1 = Vector3((float)atof(num1.m_str)
+				, (float)atof(num2.m_str), (float)atof(num3.m_str));
+		else
+			symbol.val4 = Vector4((float)atof(num1.m_str)
+				, (float)atof(num2.m_str), (float)atof(num3.m_str), (float)atof(num4.m_str));
 		
 		if ((prevLineType == 2) && collapse)
 		{
@@ -261,6 +276,24 @@ bool cCmdView::ParseFunction(const sCmd::Enum func, const char *str)
 			str = Number(str, cmd.arg2);
 		else
 			str = Str(str, cmd.arg2);
+		m_cmds.push_back(cmd);
+	}
+	break;
+
+	case sCmd::BOX2:
+	{
+		sCmd cmd;
+		cmd.cmd = func;
+		str = Str(str, cmd.id); // Box Variable Id
+		str = Match(str, ',');
+		str = Str(str, cmd.arg1); // Box Pos
+		str = Match(str, ',');
+		if (IsNumber(str)) // Box Size
+			str = Number(str, cmd.arg2);
+		else
+			str = Str(str, cmd.arg2);
+		str = Match(str, ',');
+		str = Str(str, cmd.arg3); // Box Orientation
 		m_cmds.push_back(cmd);
 	}
 	break;
@@ -383,30 +416,19 @@ bool cCmdView::IsNumber(const char *str)
 cCmdView::sCmd::Enum cCmdView::GetFunctionType(const StrId &str)
 {
 	if (str == "Triangle")
-	{
 		return sCmd::TRIANGLE;
-	}
 	else if (str == "Box")
-	{
 		return sCmd::BOX;
-	}
+	else if (str == "Box2")
+		return sCmd::BOX2;
 	else if (str == "Direction")
-	{
 		return sCmd::DIRECTION;
-	}
 	else if (str == "Collision")
-	{
 		return sCmd::COLLISION;
-	}
 	else if (str == "Camera")
-	{
 		return sCmd::CAMERA;
-	}
 	else if (str == "Ground")
-	{
 		return sCmd::GROUND;
-	}
-
 	return sCmd::NONE;
 }
 
