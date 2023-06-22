@@ -112,6 +112,7 @@ const char* cCmdView::GetLine(const char *str, OUT Str256 &out)
 // Direction dir1, curPos, dir
 // Collision tri1, dir1
 // Box box1, curPos, 0.1
+// Sphere sp1, curPos, 1
 // Camera eyePos, lookAt
 //
 // return value 0: error
@@ -298,6 +299,22 @@ bool cCmdView::ParseFunction(const sCmd::Enum func, const char *str)
 	}
 	break;
 
+	case sCmd::SPHERE:
+	{
+		sCmd cmd;
+		cmd.cmd = func;
+		str = Str(str, cmd.id); // Sphere Variable Id
+		str = Match(str, ',');
+		str = Str(str, cmd.arg1); // Sphere Pos
+		str = Match(str, ',');
+		if (IsNumber(str)) // Sphere Radius
+			str = Number(str, cmd.arg2);
+		else
+			str = Str(str, cmd.arg2);
+		m_cmds.push_back(cmd);
+	}
+	break;
+
 	case sCmd::COLLISION:
 	{
 		sCmd cmd;
@@ -421,6 +438,8 @@ cCmdView::sCmd::Enum cCmdView::GetFunctionType(const StrId &str)
 		return sCmd::BOX;
 	else if (str == "Box2")
 		return sCmd::BOX2;
+	else if (str == "Sphere")
+		return sCmd::SPHERE;
 	else if (str == "Direction")
 		return sCmd::DIRECTION;
 	else if (str == "Collision")

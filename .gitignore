@@ -288,3 +288,6 @@ __pycache__/
 *.xsd.cs
 src/3DSketch/3DSketch/errlog.txt
 src/3DSketch/3DSketch/log.txt
+Package/3DSketch_*.exe
+errlog.txt
+log.txt

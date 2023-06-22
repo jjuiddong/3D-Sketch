@@ -1,17 +1,24 @@
-+		p0	{x=1364.43750 y=0.249333680 z=5932.00000 }	common::Vector3
-+		p1	{x=1364.06250 y=0.249948353 z=5932.07813 }	common::Vector3
-+		vp0	{x=1365.12500 y=0.250004232 z=5931.79688 }	common::Vector3
-+		vp1	{x=1364.75000 y=0.250004232 z=5931.89063 }	common::Vector3
-
-+		eyePos	{x=1387.48193 y=16.7042408 z=5924.47266 }	common::Vector3
-+		lookAt	{x=1354.61731 y=-1.80036104 z=5932.97900 }	common::Vector3
-
-+		Center	{x=7.00000000 y=3.55271368e-15 z=3.75000000 }	DirectX::XMFLOAT3
-+		Extents	{x=1.55000007 y=0.100000001 z=1.30000007 }	DirectX::XMFLOAT3
-+		Orientation	{x=-0.00000000 y=0.007106829 z=0.00000000 w=1.0 }	DirectX::XMFLOAT4
+-		bbox	{m_bbox={Center={x=22.5000000 y=0.00000000 z=4.00000000 } Extents={x=2.20000005 y=1.14999998 z=0.650000036 } ...} }	common::cBoundingBox
++		common::cCollisionObj	{m_type=BOX (1) }	common::cCollisionObj
+-		m_bbox	{Center={x=22.5000000 y=0.00000000 z=4.00000000 } Extents={x=2.20000005 y=1.14999998 z=0.650000036 } ...}	DirectX::BoundingOrientedBox
++		Center1	{x=22.5000000 y=0.00000000 z=4.00000000 }	DirectX::XMFLOAT3
++		Extents1	{x=2.20000005 y=1.14999998 z=0.650000036 }	DirectX::XMFLOAT3
++		Orientation1	{x=0.00000000 y=1.00000000 z=0.00000000 ...}	DirectX::XMFLOAT4
 
 
-Box2 box, Center, Extents, Orientation
+-		bbox	{m_bbox={Center={x=22.4914646 y=0.00000000 z=4.00000000 } Extents={x=2.24146438 y=1.20000005 z=0.700000048 } ...} }	common::cBoundingBox
++		common::cCollisionObj	{m_type=BOX (1) }	common::cCollisionObj
+-		m_bbox	{Center={x=22.4914646 y=0.00000000 z=4.00000000 } Extents={x=2.24146438 y=1.20000005 z=0.700000048 } ...}	DirectX::BoundingOrientedBox
++		Center	{x=22.4914646 y=0.00000000 z=4.00000000 }	DirectX::XMFLOAT3
++		Extents	{x=2.24146438 y=1.20000005 z=0.700000048 }	DirectX::XMFLOAT3
+-		Orientation	{x=0.00000000 y=1.00000000 z=0.00000000 ...}	DirectX::XMFLOAT4
+
+
+//Box2 box1, Center, Extents, Orientation
+Box2 box5, Center1, Extents1, Orientation1
+
+Sphere s1, Center, 10
+
 //Box box2,  p1, 0.01
 //Box box3, vp0 0.01
 //Box box4,  vp1, 0.01

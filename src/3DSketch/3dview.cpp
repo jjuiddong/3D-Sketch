@@ -13,6 +13,7 @@ char *g_strHelp =
 "Triangle <var name>, <pos1>, <pos2>, <pos3>\n"
 "Box <var name>, <pos>, <size>\n"
 "Box2 <var name>, <pos>, <scale>, <rot>\n"
+"Sphere <var name>, <pos>, <radius>\n"
 "Direction <var name>, <origin pos>, <direction vector>\n"
 "Camera <eyepos>, <lookat>\n"
 "Ground <row cellcount>, <col cellcount>, <cell width>, <col height>\n"
@@ -21,6 +22,7 @@ char *g_strHelp =
 "+curPos1{x=11.6843023 y=1.00000000 z=10.2523003 }common::Vector3\n"
 "+ curPos2{ x = 20.6843023 y = 1.00000000 z = 10.2523003 }common::Vector3\n"
 "+ curPos3{ x = 11.6843023 y = 10.00000000 z = 10.2523003 }common::Vector3\n"
+"+ scale{ x = 11.6843023 y = 10.00000000 z = 10.2523003 }common::Vector3\n"
 "+ dir{ x = 1 y = 0.00000000 z = 1 }common::Vector3\n"
 "+ eyePos{x=1387.48193 y=16.7042408 z=5924.47266 }	common::Vector3\n"
 "+ lookAt{x=1354.61731 y=-1.80036104 z=5932.97900 }	common::Vector3\n"
@@ -28,6 +30,8 @@ char *g_strHelp =
 "x 0.16843023float\n"
 "Triangle tri1, curPos1, curPos2, curPos3\n"
 "Box box1, curPos1, 0.5\n"
+"Box2 box2, curPos1, scale, Orientation\n"
+"Sphere sp1, curPos1, 0.5\n"
 "Direction dir1, curPos1, dir\n"
 "Camera eyePos, lookAt \n"
 "\n"
@@ -188,11 +192,11 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 				break;
 
 			Vector3 size(1, 1, 1);
-			auto it2 = cmdView->m_vars.find(cmd.arg2); // box scale
+			auto it2 = cmdView->m_vars.find(cmd.arg2); // box radius
 			if (cmdView->m_vars.end() == it2)
 			{
 				if (!cmd.arg2.empty())
-					size = Vector3(1, 1, 1)*(float)atof(cmd.arg2.m_str);
+					size = Vector3(1, 1, 1) * (float)atof(cmd.arg2.m_str);
 			}
 			else
 			{
@@ -203,7 +207,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			auto it3 = cmdView->m_vars.find(cmd.arg3); // box orientation
 			if (cmdView->m_vars.end() != it3)
 			{
-				const Vector4 &v = it3->second.val4;
+				const Vector4& v = it3->second.val4;
 				q = Quaternion(v.x, v.y, v.z, v.w);
 			}
 
@@ -212,6 +216,33 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			renderer.m_dbgBox.SetBox(bbox);
 			renderer.m_dbgBox.m_color = cColor::WHITE;
 			renderer.m_dbgBox.Render(renderer);
+
+			RenderId(renderer, it1->second.val1, cmd.id);
+		}
+		break;
+
+		case cCmdView::sCmd::SPHERE:
+		{
+			auto it1 = cmdView->m_vars.find(cmd.arg1); // sphere position
+			if (cmdView->m_vars.end() == it1)
+				break;
+
+			Vector3 size(1, 1, 1);
+			auto it2 = cmdView->m_vars.find(cmd.arg2); // sphere scale
+			if (cmdView->m_vars.end() == it2)
+			{
+				if (!cmd.arg2.empty())
+					size = Vector3(1, 1, 1) * (float)atof(cmd.arg2.m_str);
+			}
+			else
+			{
+				size = it2->second.val1;
+			}
+
+			renderer.m_dbgSphere.SetPos(it1->second.val1);
+			renderer.m_dbgSphere.SetRadius(size.x);
+			renderer.m_dbgSphere.m_color = cColor::WHITE;
+			renderer.m_dbgSphere.Render(renderer);
 
 			RenderId(renderer, it1->second.val1, cmd.id);
 		}
