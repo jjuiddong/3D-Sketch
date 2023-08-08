@@ -112,7 +112,8 @@ const char* cCmdView::GetLine(const char *str, OUT Str256 &out)
 // Direction dir1, curPos, dir
 // Collision tri1, dir1
 // Box box1, curPos, 0.1
-// Sphere sp1, curPos, 1
+// Sphere sp1, curPos, radisu
+// Capsule cp1, curPos, halflen, radius
 // Camera eyePos, lookAt
 //
 // return value 0: error
@@ -261,6 +262,8 @@ bool cCmdView::ParseFunction(const sCmd::Enum func, const char *str)
 		str = Str(str, cmd.arg1); // Origin Pos
 		str = Match(str, ',');
 		str = Str(str, cmd.arg2); // Direction Vector
+		str = Match(str, ',');
+		str = Str(str, cmd.arg3); // Direction Length
 		m_cmds.push_back(cmd);
 	}
 	break;
@@ -311,6 +314,28 @@ bool cCmdView::ParseFunction(const sCmd::Enum func, const char *str)
 			str = Number(str, cmd.arg2);
 		else
 			str = Str(str, cmd.arg2);
+		m_cmds.push_back(cmd);
+	}
+	break;
+
+	case sCmd::CAPSULE:
+	{
+		sCmd cmd;
+		cmd.cmd = func;
+		str = Str(str, cmd.id); // Capsule Variable Id
+		str = Match(str, ',');
+		str = Str(str, cmd.arg1); // Capsule Pos
+		str = Match(str, ',');
+		str = Str(str, cmd.arg2); // Capsule dir
+		str = Match(str, ',');
+		if (IsNumber(str)) // Capsule HalfLen
+			str = Number(str, cmd.arg3);
+		else
+			str = Str(str, cmd.arg3);
+		if (IsNumber(str)) // Capsule Radius
+			str = Number(str, cmd.arg4);
+		else
+			str = Str(str, cmd.arg4);
 		m_cmds.push_back(cmd);
 	}
 	break;
@@ -440,6 +465,8 @@ cCmdView::sCmd::Enum cCmdView::GetFunctionType(const StrId &str)
 		return sCmd::BOX2;
 	else if (str == "Sphere")
 		return sCmd::SPHERE;
+	else if (str == "Capsule")
+		return sCmd::CAPSULE;
 	else if (str == "Direction")
 		return sCmd::DIRECTION;
 	else if (str == "Collision")

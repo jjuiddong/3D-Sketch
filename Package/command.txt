@@ -1,23 +1,30 @@
--		bbox	{m_bbox={Center={x=22.5000000 y=0.00000000 z=4.00000000 } Extents={x=2.20000005 y=1.14999998 z=0.650000036 } ...} }	common::cBoundingBox
-+		common::cCollisionObj	{m_type=BOX (1) }	common::cCollisionObj
--		m_bbox	{Center={x=22.5000000 y=0.00000000 z=4.00000000 } Extents={x=2.20000005 y=1.14999998 z=0.650000036 } ...}	DirectX::BoundingOrientedBox
-+		Center1	{x=22.5000000 y=0.00000000 z=4.00000000 }	DirectX::XMFLOAT3
-+		Extents1	{x=2.20000005 y=1.14999998 z=0.650000036 }	DirectX::XMFLOAT3
-+		Orientation1	{x=0.00000000 y=1.00000000 z=0.00000000 ...}	DirectX::XMFLOAT4
+-		m_bbox	{Center={x=17.3511620 y=0.00000000 z=11.0000000 } Extents={x=1.40116262 y=1.29999995 z=0.699999988 } ...}	DirectX::BoundingOrientedBox
++		Center1	{x=17.3511620 y=0.00000000 z=11.0000000 }	DirectX::XMFLOAT3
++		Extents1	{x=1.40116262 y=1.29999995 z=0.699999988 }	DirectX::XMFLOAT3
++		Orientation1	{x=0.00000000 y=0.00000000 z=0.00000000 w=1.0}	DirectX::XMFLOAT4
+
++		Center2	{x=10.0000000 y=3.00000000 z=14.0000000 }	DirectX::XMFLOAT3
++		Extents2	{x=7.00000000 y=3.00000000 z=2.29999995 }	DirectX::XMFLOAT3
++		Orientation2	{x=0.00000000 y=0.00000000 z=0.00000000 w=1.0}	DirectX::XMFLOAT4
+
++		Center3	{x=17.1000004 y=0.00000000 z=11.0000000 }	DirectX::XMFLOAT3
++		Extents3	{x=1.14999998 y=1.29999995 z=0.699999988 }	DirectX::XMFLOAT3
++		Orientation3	{x=0.00000000 y=1.00000000 z=0.00000000 w=0.0}	DirectX::XMFLOAT4
+
++		dir	{x=0.913545430 y=0.00000000 z=-0.406736612 }	common::Vector3
++		pos	{x=12.1000004 y=0.00000000 z=2.00000000 }	common::Vector3
+
++		dir2	{x=1.00000000 y=1.22464712e-16 z=0.00000000 }	common::Vector3
++		pos2	{x=10.8999996 y=0.00000000 z=1.00000000 }	common::Vector3
+len 1.64
 
 
--		bbox	{m_bbox={Center={x=22.4914646 y=0.00000000 z=4.00000000 } Extents={x=2.24146438 y=1.20000005 z=0.700000048 } ...} }	common::cBoundingBox
-+		common::cCollisionObj	{m_type=BOX (1) }	common::cCollisionObj
--		m_bbox	{Center={x=22.4914646 y=0.00000000 z=4.00000000 } Extents={x=2.24146438 y=1.20000005 z=0.700000048 } ...}	DirectX::BoundingOrientedBox
-+		Center	{x=22.4914646 y=0.00000000 z=4.00000000 }	DirectX::XMFLOAT3
-+		Extents	{x=2.24146438 y=1.20000005 z=0.700000048 }	DirectX::XMFLOAT3
--		Orientation	{x=0.00000000 y=1.00000000 z=0.00000000 ...}	DirectX::XMFLOAT4
+//Box2 box1, Center1, Extents1, Orientation1
+//Box2 box2, Center2, Extents2, Orientation2
+//Box2 box3, Center3, Extents3, Orientation3
 
-
-//Box2 box1, Center, Extents, Orientation
-Box2 box5, Center1, Extents1, Orientation1
-
-Sphere s1, Center, 10
+Sphere s1, Center1, 1
+Capsule c1, Center2, dir2, 2, 1
 
 //Box box2,  p1, 0.01
 //Box box3, vp0 0.01

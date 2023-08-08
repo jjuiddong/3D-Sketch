@@ -40,6 +40,8 @@ public:
 	bool m_showAxis;
 	bool m_showId;
 	graphic::cDbgLineList m_lineList;
+	graphic::cSphere m_sphere;
+	graphic::cCapsule2 m_capsule;
 
 	// MouseMove Variable
 	POINT m_viewPos;

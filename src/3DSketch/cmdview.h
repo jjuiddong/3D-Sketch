@@ -24,6 +24,7 @@ public:
 			BOX, 
 			BOX2, 
 			SPHERE,
+			CAPSULE,
 			DIRECTION, 
 			COLLISION, 
 			CAMERA, 

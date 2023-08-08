@@ -29,10 +29,11 @@ char *g_strHelp =
 "+ Orientation{x=-0.00000000 y=0.707106829 z=0.00000000 w=0.707 } common::Quaternion\n"
 "x 0.16843023float\n"
 "Triangle tri1, curPos1, curPos2, curPos3\n"
-"Box box1, curPos1, 0.5\n"
+"Box box1, curPos1, size\n"
 "Box2 box2, curPos1, scale, Orientation\n"
-"Sphere sp1, curPos1, 0.5\n"
-"Direction dir1, curPos1, dir\n"
+"Sphere sp1, curPos1, radius\n"
+"Capsule cp1, pos, dir, halflen, radius\n"
+"Direction dir1, curPos1, dir, length\n"
 "Camera eyePos, lookAt \n"
 "\n"
 ;
@@ -68,8 +69,16 @@ bool c3DView::Init(cRenderer &renderer)
 	m_renderTarget.Create(renderer, vp, DXGI_FORMAT_R8G8B8A8_UNORM, true, true
 		, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
-	m_ground.Create(renderer, 100, 100, 10, 10);
+	m_ground.Create(renderer, 200, 200, 1, 1);
 	m_lineList.Create(renderer, 100);
+	m_sphere.Create(renderer, 1, 10, 10);
+	m_sphere.SetRenderFlag(graphic::eRenderFlag::ALPHABLEND, true);
+	m_sphere.SetTechnique("Outline2");
+	m_capsule.Create(renderer, 1.f, 1.f, 10, 10
+		, eVertexType::POSITION | eVertexType::NORMAL
+		, cColor(1.f, 1.f, 1.f, 0.2f));
+	m_capsule.SetRenderFlag(graphic::eRenderFlag::ALPHABLEND, true);
+	m_capsule.SetTechnique("Outline2");
 
 	return true;
 }
@@ -83,27 +92,26 @@ void c3DView::OnUpdate(const float deltaSeconds)
 void c3DView::OnPreRender(const float deltaSeconds)
 {
 	cRenderer &renderer = GetRenderer();
+	
 	cAutoCam cam(&m_camera);
-
+	renderer.UnbindShaderAll();
 	renderer.UnbindTextureAll();
-
 	GetMainCamera().Bind(renderer);
 	GetMainLight().Bind(renderer);
 
 	if (m_renderTarget.Begin(renderer))
 	{
-		CommonStates states(renderer.GetDevice());
-		renderer.GetDevContext()->RSSetState(states.Wireframe());
-
+		//CommonStates states(renderer.GetDevice());
+		//renderer.GetDevContext()->RSSetState(states.Wireframe());
+		renderer.GetDevContext()->RSSetState(renderer.m_renderState.CullCounterClockwise());
 		if (m_showGround)
 			m_ground.Render(renderer);
-
 		if (m_showAxis)
 			renderer.RenderAxis();
-
 		RenderCmd(renderer);
 	}
 	m_renderTarget.End(renderer);
+	renderer.UnbindTextureAll();
 }
 
 
@@ -168,7 +176,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it2)
 			{
 				if (!cmd.arg2.empty())
-					size = Vector3(1, 1, 1)*(float)atof(cmd.arg2.m_str);
+					size = Vector3(1, 1, 1)*(float)atof(cmd.arg2.c_str());
 			}
 			else
 			{
@@ -196,7 +204,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it2)
 			{
 				if (!cmd.arg2.empty())
-					size = Vector3(1, 1, 1) * (float)atof(cmd.arg2.m_str);
+					size = Vector3(1, 1, 1) * (float)atof(cmd.arg2.c_str());
 			}
 			else
 			{
@@ -232,17 +240,65 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it2)
 			{
 				if (!cmd.arg2.empty())
-					size = Vector3(1, 1, 1) * (float)atof(cmd.arg2.m_str);
+					size = Vector3(1, 1, 1) * (float)atof(cmd.arg2.c_str());
 			}
 			else
 			{
 				size = it2->second.val1;
 			}
 
-			renderer.m_dbgSphere.SetPos(it1->second.val1);
-			renderer.m_dbgSphere.SetRadius(size.x);
-			renderer.m_dbgSphere.m_color = cColor::WHITE;
-			renderer.m_dbgSphere.Render(renderer);
+			m_sphere.m_transform.pos = it1->second.val1;
+			m_sphere.SetRadius(size.x);
+			const XMVECTOR color2 = Vector4(1, 1, 1, 1).GetVectorXM();
+			renderer.m_cbPerFrame.m_v->outlineColor = color2;
+			m_sphere.Render(renderer);
+
+			RenderId(renderer, it1->second.val1, cmd.id);
+		}
+		break;
+
+		case cCmdView::sCmd::CAPSULE:
+		{
+			auto it1 = cmdView->m_vars.find(cmd.arg1); // capsule position
+			if (cmdView->m_vars.end() == it1)
+				break;
+
+			auto it2 = cmdView->m_vars.find(cmd.arg2); // capsule direction
+			if (cmdView->m_vars.end() == it1)
+				break;
+
+			float halfLen = 1.f;
+			auto it3 = cmdView->m_vars.find(cmd.arg2); // capsule halflen
+			if (cmdView->m_vars.end() == it3)
+			{
+				if (!cmd.arg2.empty())
+					halfLen = (float)atof(cmd.arg2.c_str());
+			}
+			else
+			{
+				halfLen = it3->second.val1.x;
+			}
+
+			float radius = 1.f;
+			auto it4 = cmdView->m_vars.find(cmd.arg3); // capsule radius
+			if (cmdView->m_vars.end() == it4)
+			{
+				if (!cmd.arg3.empty())
+					radius = (float)atof(cmd.arg3.c_str());
+			}
+			else
+			{
+				halfLen = it4->second.val1.x;
+			}
+
+			const Vector3 center = it1->second.val1;
+			const Vector3 dir = it2->second.val1;
+			const Vector3 p0 = center + dir * halfLen;
+			const Vector3 p1 = center - dir * halfLen;
+			m_capsule.SetCapsule(p0, p1, radius);
+			const XMVECTOR color2 = Vector4(1, 1, 1, 1).GetVectorXM();
+			renderer.m_cbPerFrame.m_v->outlineColor = color2;
+			m_capsule.Render(renderer);
 
 			RenderId(renderer, it1->second.val1, cmd.id);
 		}
@@ -258,9 +314,21 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it2)
 				break;
 
+			float len = 10.f;
+			auto it3 = cmdView->m_vars.find(cmd.arg3); // Length
+			if (cmdView->m_vars.end() == it3)
+			{
+				if (!cmd.arg3.empty())
+					len = (float)atof(cmd.arg3.c_str());
+			}
+			else
+			{
+				len = it3->second.val1.x;
+			}				
+
 			const Vector3 orig = it1->second.val1;
 			const Vector3 dir = it2->second.val1;
-			renderer.m_dbgLine.SetLine(orig, orig + dir * 10.f, 0.05f);
+			renderer.m_dbgLine.SetLine(orig, orig + dir * len, 0.05f);
 			renderer.m_dbgLine.Render(renderer);
 
 			cCmdView::sSymbol symbol;
@@ -345,7 +413,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it1)
 			{
 				if (!cmd.arg1.empty())
-					rowCellCount = atoi(cmd.arg1.m_str);
+					rowCellCount = atoi(cmd.arg1.c_str());
 			}
 			else
 			{
@@ -356,7 +424,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it2)
 			{
 				if (!cmd.arg2.empty())
-					colCellCount = atoi(cmd.arg2.m_str);
+					colCellCount = atoi(cmd.arg2.c_str());
 			}
 			else
 			{
@@ -367,7 +435,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it3)
 			{
 				if (!cmd.arg3.empty())
-					cellWidth = (float)atof(cmd.arg3.m_str);
+					cellWidth = (float)atof(cmd.arg3.c_str());
 			}
 			else
 			{
@@ -378,7 +446,7 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			if (cmdView->m_vars.end() == it4)
 			{
 				if (!cmd.arg4.empty())
-					cellHeight = (float)atof(cmd.arg4.m_str);
+					cellHeight = (float)atof(cmd.arg4.c_str());
 			}
 			else
 			{
@@ -511,11 +579,11 @@ void c3DView::OnWheelMove(const float delta, const POINT mousePt)
 	// zoom in/out
 	float zoomLen = 0;
 	if (len > 100)
-		zoomLen = 50;
+		zoomLen = 10;
 	else if (len > 50)
-		zoomLen = max(1.f, (len / 2.f));
+		zoomLen = max(1.f, (len / 5.f));
 	else
-		zoomLen = (len / 3.f);
+		zoomLen = (len / 10.f);
 
 	//Vector3 eyePos = GetMainCamera().m_eyePos + ray.dir * ((delta <= 0) ? -zoomLen : zoomLen);
 	GetMainCamera().Zoom(ray.dir, (delta < 0) ? -zoomLen : zoomLen);
