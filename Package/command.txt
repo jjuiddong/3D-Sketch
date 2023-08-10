@@ -1,30 +1,28 @@
--		m_bbox	{Center={x=17.3511620 y=0.00000000 z=11.0000000 } Extents={x=1.40116262 y=1.29999995 z=0.699999988 } ...}	DirectX::BoundingOrientedBox
-+		Center1	{x=17.3511620 y=0.00000000 z=11.0000000 }	DirectX::XMFLOAT3
-+		Extents1	{x=1.40116262 y=1.29999995 z=0.699999988 }	DirectX::XMFLOAT3
-+		Orientation1	{x=0.00000000 y=0.00000000 z=0.00000000 w=1.0}	DirectX::XMFLOAT4
+-		bcapsule	{m_radius=1.32769310 m_line={dir={x=0.00000000 y=1.00000000 z=0.00000000 } pos={x=18.0000000 y=0.00499999989 ...} ...} }	common::cBoundingCapsule
++		common::cCollisionObj	{m_type=CAPSULE (6) }	common::cCollisionObj
+		m_radius1	1.32769310	float
+-		m_line	{dir={x=0.00000000 y=1.00000000 z=0.00000000 } pos={x=18.0000000 y=0.00499999989 z=7.00000000 } len=...}	common::Line
++		dir1	{x=0.00000000 y=1.00000000 z=0.00000000 }	common::Vector3
++		pos1	{x=18.00000 y=0.00499999989 z=7.00000000 }	common::Vector3
+		len1	0.00499999989	float
 
-+		Center2	{x=10.0000000 y=3.00000000 z=14.0000000 }	DirectX::XMFLOAT3
-+		Extents2	{x=7.00000000 y=3.00000000 z=2.29999995 }	DirectX::XMFLOAT3
-+		Orientation2	{x=0.00000000 y=0.00000000 z=0.00000000 w=1.0}	DirectX::XMFLOAT4
 
-+		Center3	{x=17.1000004 y=0.00000000 z=11.0000000 }	DirectX::XMFLOAT3
-+		Extents3	{x=1.14999998 y=1.29999995 z=0.699999988 }	DirectX::XMFLOAT3
-+		Orientation3	{x=0.00000000 y=1.00000000 z=0.00000000 w=0.0}	DirectX::XMFLOAT4
-
-+		dir	{x=0.913545430 y=0.00000000 z=-0.406736612 }	common::Vector3
-+		pos	{x=12.1000004 y=0.00000000 z=2.00000000 }	common::Vector3
-
-+		dir2	{x=1.00000000 y=1.22464712e-16 z=0.00000000 }	common::Vector3
-+		pos2	{x=10.8999996 y=0.00000000 z=1.00000000 }	common::Vector3
-len 1.64
+-		bcapsule	{m_radius=1.80570495 m_line={dir={x=0.00000000 y=1.00000000 z=0.00000000 } pos={x=17.0000000 y=0.00499999989 ...} ...} }	common::cBoundingCapsule
++		common::cCollisionObj	{m_type=CAPSULE (6) }	common::cCollisionObj
+		m_radius2	1.80570495	float
+-		m_line	{dir={x=0.00000000 y=1.00000000 z=0.00000000 } pos={x=17.0000000 y=0.00499999989 z=4.00000000 } len=...}	common::Line
++		dir2	{x=0.00000000 y=1.00000000 z=0.00000000 }	common::Vector3
++		pos2	{x=17.0000000 y=0.00499999989 z=4.00000000 }	common::Vector3
+		len2	0.00499999989	float
 
 
 //Box2 box1, Center1, Extents1, Orientation1
 //Box2 box2, Center2, Extents2, Orientation2
 //Box2 box3, Center3, Extents3, Orientation3
 
-Sphere s1, Center1, 1
-Capsule c1, Center2, dir2, 2, 1
+//Sphere s1, Center1, 1
+Capsule c1, pos1, dir1, len1, m_radius1
+Capsule c2, pos2, dir2, len2, m_radius2
 
 //Box box2,  p1, 0.01
 //Box box3, vp0 0.01

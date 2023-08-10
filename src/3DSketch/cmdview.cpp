@@ -332,6 +332,7 @@ bool cCmdView::ParseFunction(const sCmd::Enum func, const char *str)
 			str = Number(str, cmd.arg3);
 		else
 			str = Str(str, cmd.arg3);
+		str = Match(str, ',');
 		if (IsNumber(str)) // Capsule Radius
 			str = Number(str, cmd.arg4);
 		else

@@ -71,10 +71,10 @@ bool c3DView::Init(cRenderer &renderer)
 
 	m_ground.Create(renderer, 200, 200, 1, 1);
 	m_lineList.Create(renderer, 100);
-	m_sphere.Create(renderer, 1, 10, 10);
+	m_sphere.Create(renderer, 1, 30, 30);
 	m_sphere.SetRenderFlag(graphic::eRenderFlag::ALPHABLEND, true);
 	m_sphere.SetTechnique("Outline2");
-	m_capsule.Create(renderer, 1.f, 1.f, 10, 10
+	m_capsule.Create(renderer, 1.f, 1.f, 30, 30
 		, eVertexType::POSITION | eVertexType::NORMAL
 		, cColor(1.f, 1.f, 1.f, 0.2f));
 	m_capsule.SetRenderFlag(graphic::eRenderFlag::ALPHABLEND, true);
@@ -268,11 +268,11 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 				break;
 
 			float halfLen = 1.f;
-			auto it3 = cmdView->m_vars.find(cmd.arg2); // capsule halflen
+			auto it3 = cmdView->m_vars.find(cmd.arg3); // capsule halflen
 			if (cmdView->m_vars.end() == it3)
 			{
-				if (!cmd.arg2.empty())
-					halfLen = (float)atof(cmd.arg2.c_str());
+				if (!cmd.arg3.empty())
+					halfLen = (float)atof(cmd.arg3.c_str());
 			}
 			else
 			{
@@ -280,15 +280,15 @@ void c3DView::RenderCmd(graphic::cRenderer &renderer)
 			}
 
 			float radius = 1.f;
-			auto it4 = cmdView->m_vars.find(cmd.arg3); // capsule radius
+			auto it4 = cmdView->m_vars.find(cmd.arg4); // capsule radius
 			if (cmdView->m_vars.end() == it4)
 			{
-				if (!cmd.arg3.empty())
-					radius = (float)atof(cmd.arg3.c_str());
+				if (!cmd.arg4.empty())
+					radius = (float)atof(cmd.arg4.c_str());
 			}
 			else
 			{
-				halfLen = it4->second.val1.x;
+				radius = it4->second.val1.x;
 			}
 
 			const Vector3 center = it1->second.val1;
